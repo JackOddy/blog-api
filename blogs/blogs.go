@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strings"
 )
 
 type Blog struct {
@@ -19,7 +18,7 @@ func HandleReq(res http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case "GET":
-		err, response = getBlogs(req)
+		err, response = getBlog(req.URL.Path)
 	case "POST":
 		err, response = postBlogs(req)
 	default:
@@ -41,21 +40,16 @@ func postBlogs(req *http.Request) (error, string) {
 
 	var blog Blog
 	err := decoder.Decode(&blog)
-
 	println(req.URL.Path)
 	return err, "post posted"
-
 }
 
-func getBlogs(req *http.Request) (error, string) {
-	x := Blog{"hello", "this is a great blog"}
+func getBlog(title string) (error, string) {
 
-	blog, err := json.Marshal(x)
-
-	// extract path variables from the URL - returns []string
-	params := strings.Split(req.URL.Path, "/")
-	for _, x := range params {
-		println(x)
+	// get the blog post from file or db
+	if title == "" {
+		title = "hello"
 	}
-	return err, string(blog)
+
+	return error(nil), title
 }
