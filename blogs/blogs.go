@@ -1,55 +1,30 @@
 package blogs
 
 import (
-	"encoding/json"
+	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 )
 
-type Blog struct {
-	Title, Body string
+func Index(res http.ResponseWriter, req *http.Request) {
+	io.WriteString(res, "Blog Post Index")
 }
 
-func HandleReq(res http.ResponseWriter, req *http.Request) {
-	var (
-		err      error
-		response string
-	)
-
-	switch req.Method {
-	case "GET":
-		err, response = getBlog(req.URL.Path)
-	case "POST":
-		err, response = postBlogs(req)
-	default:
-		err, response = error(nil), "default"
-	}
-
-	if err != nil {
-		panic(err)
-	}
-
-	io.WriteString(
-		res,
-		response,
-	)
+func Create(res http.ResponseWriter, req *http.Request) {
+	io.WriteString(res, "Blog Post Index")
 }
 
-func postBlogs(req *http.Request) (error, string) {
-	decoder := json.NewDecoder(req.Body)
-
-	var blog Blog
-	err := decoder.Decode(&blog)
-	println(req.URL.Path)
-	return err, "post posted"
+func Read(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	io.WriteString(res, "Blog Post Read: "+vars["id"])
 }
 
-func getBlog(title string) (error, string) {
+func Update(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	io.WriteString(res, "Blog Post Update: "+vars["id"])
+}
 
-	// get the blog post from file or db
-	if title == "" {
-		title = "hello"
-	}
-
-	return error(nil), title
+func Delete(res http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	io.WriteString(res, "Blog Post Delete: "+vars["id"])
 }

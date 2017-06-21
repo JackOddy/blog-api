@@ -1,29 +1,14 @@
 package main
 
 import (
-	"blog-api/blogs"
-	"io"
+	"blog-api/router"
 	"net/http"
 )
 
-func index(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set(
-		"content-type",
-		"application/json",
-	)
-	io.WriteString(res, "index")
-}
-
 func main() {
+	app := router.NewRouter()
 
-	http.HandleFunc("/", index)
-	http.Handle("/blogs/",
-		http.StripPrefix("/blogs/",
-			http.HandlerFunc(blogs.HandleReq),
-		),
-	)
-
-	defer http.ListenAndServe(":9000", nil)
+	defer http.ListenAndServe(":9000", app)
 	println("-->")
 	println("server started on localhost:9000")
 }
