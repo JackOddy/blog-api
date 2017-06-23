@@ -1,10 +1,15 @@
 package blogs
 
-import "time"
+import (
+	"time"
+)
 
-type Blog struct {
-	Title, Body, Type string
-	TimeStamp         time.Time
+type BlogHeader struct {
+	Title     string    `json:"title"`
+	Type      string    `json:"type"`
+	Content   string    `json:"content"`
+	TimeStamp time.Time `json:"timeStamp"`
+	Slug      string    `json:"slug"`
 }
 
-type Blogs []Blog
+type Blogs []BlogHeader
