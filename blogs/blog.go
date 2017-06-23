@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type BlogHeader struct {
+type Blog struct {
 	Title     string    `json:"title"`
 	Type      string    `json:"type"`
 	Content   string    `json:"content"`
@@ -12,4 +12,4 @@ type BlogHeader struct {
 	Slug      string    `json:"slug"`
 }
 
-type Blogs []BlogHeader
+type Blogs []Blog

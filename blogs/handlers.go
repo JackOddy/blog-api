@@ -15,7 +15,7 @@ func Index(res http.ResponseWriter, req *http.Request) {
 
 func Create(res http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
-	blog := BlogHeader{TimeStamp: time.Now()}
+	blog := Blog{TimeStamp: time.Now()}
 	err := decoder.Decode(&blog)
 	if err != nil {
 		panic(err)
