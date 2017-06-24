@@ -14,7 +14,7 @@ var routes = Routes{
 	Route{
 		"BlogPostRead",
 		"GET",
-		"/blog-posts/{id}",
+		"/blog-posts/{slug}",
 		blogs.Read,
 	},
 	Route{
@@ -26,13 +26,13 @@ var routes = Routes{
 	Route{
 		"BlogPostUpdate",
 		"PUT",
-		"/blog-posts/{id}",
+		"/blog-posts/{slug}",
 		blogs.Update,
 	},
 	Route{
 		"BlogPostDelete",
 		"DELETE",
-		"/blog-posts/{id}",
+		"/blog-posts/{slug}",
 		blogs.Delete,
 	},
 }
