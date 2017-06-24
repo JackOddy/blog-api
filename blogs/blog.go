@@ -4,12 +4,17 @@ import (
 	"time"
 )
 
-type Blog struct {
+type BlogInfo struct {
 	Title     string    `json:"title"`
 	Type      string    `json:"type"`
-	Content   string    `json:"content"`
+	Key       string    `json:"key"`
 	TimeStamp time.Time `json:"timeStamp"`
 	Slug      string    `json:"slug"`
+}
+
+type Blog struct {
+	Headers BlogInfo `json:"headers"`
+	Content string   `json:"content"`
 }
 
 type Blogs []Blog
