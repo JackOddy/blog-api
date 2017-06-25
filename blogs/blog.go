@@ -76,7 +76,7 @@ func setMeta(blogMeta *BlogMeta) {
 }
 
 func setContent(blog *Blog) {
-	redis.Client.SetNX(blog.Meta.Key, blog.Content, 0)
+	redis.Client.Set(blog.Meta.Key, blog.Content, 0)
 }
 
 func SetBlog(blog *Blog) {
