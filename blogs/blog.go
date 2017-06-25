@@ -3,6 +3,7 @@ package blogs
 import (
 	"blog-api/redis"
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 )
@@ -57,15 +58,16 @@ func NewBlog(body io.Reader) (blog Blog) {
 }
 
 func setMeta(blogMeta *BlogMeta) {
-	meta, err := json.Marshal(blogMeta)
+	redis.Client.SAdd(blogMeta.Slug, blogMeta, 0)
+	meta, err := redis.Client.SMembers(blogMeta.Slug).Result()
 	if err != nil {
-		panic(err)
+		println("didnt work")
 	}
-	redis.Client.Set(blogMeta.Slug, meta, 0)
+	fmt.Println(meta)
 }
 
 func setContent(blog *Blog) {
-	redis.Client.Set(blog.Meta.Key, blog.Content, 0)
+	redis.Client.SetNX(blog.Meta.Key, blog.Content, 0)
 }
 
 func SetBlog(blog *Blog) {
