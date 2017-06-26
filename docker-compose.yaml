@@ -1,0 +1,16 @@
+version: '2'
+services:
+  blog-api:
+    build:
+      .
+    ports:
+      - "9000:9000"
+    depends_on:
+      - redis
+  redis:
+    image:
+      redis
+    ports:
+      - "6379:26379"
+    volumes:
+      - /data/db
