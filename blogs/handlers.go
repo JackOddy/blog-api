@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/mux"
 	"io"
 	"net/http"
-	"time"
 )
 
 func Index(res http.ResponseWriter, req *http.Request) {
@@ -18,8 +17,6 @@ func Create(res http.ResponseWriter, req *http.Request) {
 }
 
 func Read(res http.ResponseWriter, req *http.Request) {
-	start := time.Now()
-	defer println(time.Since(start))
 	vars := mux.Vars(req)
 	blog := GetBlog(vars["slug"])
 

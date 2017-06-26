@@ -3,15 +3,15 @@ package blogs
 import (
 	"blog-api/redis"
 	"encoding/json"
+	"fmt"
 	"io"
-	"sync"
 	"time"
 )
 
 type BlogMeta struct {
 	Title     string    `json:"title"`
 	Type      string    `json:"type"`
-	Key       string    `json:"-"`
+	Key       string    `json:"key"`
 	TimeStamp time.Time `json:"timeStamp"`
 	Slug      string    `json:"slug"`
 }
@@ -23,37 +23,27 @@ type Blog struct {
 
 type Blogs []Blog
 
-func GetBlog(slug string) Blog {
-	metaChannel := make(chan BlogMeta, 1)
-	contentChannel := make(chan string, 1)
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go getMetaData(slug, metaChannel, &wg)
-	go getContent("blogs/"+slug, contentChannel, &wg)
-	wg.Wait()
-	meta := <-metaChannel
-	content := <-contentChannel
+func GetBlog(id string) Blog {
+	meta := getMetaData(id)
+	content := getContent(meta.Key)
 	return Blog{meta, content}
 }
 
-func getMetaData(key string, c chan BlogMeta, wg *sync.WaitGroup) {
-	defer wg.Done()
-	data, err := redis.Client.Get(key).Result()
+func getMetaData(id string) (meta BlogMeta) {
+	data, err := redis.Client.Get(id).Result()
 	if err != nil {
 		panic(err)
 	}
-	var meta BlogMeta
 	json.Unmarshal([]byte(data), &meta)
-	c <- meta
+	return
 }
 
-func getContent(key string, c chan string, wg *sync.WaitGroup) {
-	defer wg.Done()
+func getContent(key string) (content string) {
 	content, err := redis.Client.Get(key).Result()
 	if err != nil {
 		panic(err)
 	}
-	c <- content
+	return
 }
 
 func NewBlog(body io.Reader) (blog Blog) {
@@ -68,11 +58,12 @@ func NewBlog(body io.Reader) (blog Blog) {
 }
 
 func setMeta(blogMeta *BlogMeta) {
-	meta, err := json.Marshal(blogMeta)
+	redis.Client.SAdd(blogMeta.Slug, blogMeta, 0)
+	meta, err := redis.Client.SMembers(blogMeta.Slug).Result()
 	if err != nil {
-		panic(err)
+		println("didnt work")
 	}
-	redis.Client.SetNX(blogMeta.Slug, meta, 0)
+	fmt.Println(meta)
 }
 
 func setContent(blog *Blog) {
