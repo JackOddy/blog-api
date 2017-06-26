@@ -23,9 +23,10 @@ type Blog struct {
 type Blogs []Blog
 
 func GetBlog(slug string) Blog {
-	meta := getMetaData(slug)
-	content := getContent("blogs/" + slug)
-	return Blog{meta, content}
+	return Blog{
+		getMetaData(slug),
+		getContent("blogs/" + slug),
+	}
 }
 
 func getMetaData(key string) (meta BlogMeta) {
@@ -56,24 +57,50 @@ func NewBlog(body io.Reader) (blog Blog) {
 	return
 }
 
-func setMeta(blogMeta *BlogMeta) {
+func marshalMeta(blogMeta BlogMeta) (meta []byte) {
 	meta, err := json.Marshal(blogMeta)
+
 	if err != nil {
 		panic(err)
 	}
-	redis.Client.SetNX(blogMeta.Slug, meta, 0)
-}
 
-func setContent(blog *Blog) {
-	redis.Client.SetNX(blog.Meta.Key, blog.Content, 0)
+	return
 }
 
 func SetBlog(blog *Blog) {
-	setMeta(&blog.Meta)
-	setContent(blog)
+	redis.Client.MSetNX(
+		blog.Meta.Slug, marshalMeta(blog.Meta),
+		blog.Meta.Key, blog.Content,
+	)
+}
+func exists(key string) bool {
+
+	t, _ := redis.Client.Exists(key).Result()
+
+	if t == 1 {
+		return true
+	}
+
+	return false
 }
 
-func DeleteBlog(slug string) (r int64, err error) {
-	r, err = redis.Client.Del(slug, "blogs/"+slug).Result()
-	return
+func UpdateBlog(key string, blog Blog) bool {
+	if exists(key) {
+		redis.Client.MSet(
+			key, marshalMeta(blog.Meta),
+			"blogs/"+key, blog.Content,
+		)
+		return true
+	}
+	return false
+}
+
+func DeleteBlog(slug string) bool {
+	t, _ := redis.Client.Del(slug, "blogs/"+slug).Result()
+
+	if t != 0 {
+		return true
+	}
+
+	return false
 }
