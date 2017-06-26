@@ -3,7 +3,6 @@ package blogs
 import (
 	"blog-api/redis"
 	"encoding/json"
-	"fmt"
 	"io"
 	"time"
 )
@@ -11,7 +10,7 @@ import (
 type BlogMeta struct {
 	Title     string    `json:"title"`
 	Type      string    `json:"type"`
-	Key       string    `json:"key"`
+	Key       string    `json:"-"`
 	TimeStamp time.Time `json:"timeStamp"`
 	Slug      string    `json:"slug"`
 }
@@ -23,14 +22,14 @@ type Blog struct {
 
 type Blogs []Blog
 
-func GetBlog(id string) Blog {
-	meta := getMetaData(id)
-	content := getContent(meta.Key)
+func GetBlog(slug string) Blog {
+	meta := getMetaData(slug)
+	content := getContent("blogs/" + slug)
 	return Blog{meta, content}
 }
 
-func getMetaData(id string) (meta BlogMeta) {
-	data, err := redis.Client.Get(id).Result()
+func getMetaData(key string) (meta BlogMeta) {
+	data, err := redis.Client.Get(key).Result()
 	if err != nil {
 		panic(err)
 	}
@@ -58,16 +57,15 @@ func NewBlog(body io.Reader) (blog Blog) {
 }
 
 func setMeta(blogMeta *BlogMeta) {
-	redis.Client.SAdd(blogMeta.Slug, blogMeta, 0)
-	meta, err := redis.Client.SMembers(blogMeta.Slug).Result()
+	meta, err := json.Marshal(blogMeta)
 	if err != nil {
-		println("didnt work")
+		panic(err)
 	}
-	fmt.Println(meta)
+	redis.Client.SetNX(blogMeta.Slug, meta, 0)
 }
 
 func setContent(blog *Blog) {
-	redis.Client.Set(blog.Meta.Key, blog.Content, 0)
+	redis.Client.SetNX(blog.Meta.Key, blog.Content, 0)
 }
 
 func SetBlog(blog *Blog) {
