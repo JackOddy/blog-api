@@ -29,6 +29,13 @@ func Update(res http.ResponseWriter, req *http.Request) {
 }
 
 func Delete(res http.ResponseWriter, req *http.Request) {
+	result := "Successfully Deleted"
 	vars := mux.Vars(req)
-	io.WriteString(res, "Blog Post Delete: "+vars["slug"])
+	_, err := DeleteBlog(vars["slug"])
+
+	if err != nil {
+		result = "Error: Could not Delete"
+	}
+
+	io.WriteString(res, result)
 }

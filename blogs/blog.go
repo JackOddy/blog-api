@@ -72,3 +72,8 @@ func SetBlog(blog *Blog) {
 	setMeta(&blog.Meta)
 	setContent(blog)
 }
+
+func DeleteBlog(slug string) (r int64, err error) {
+	r, err = redis.Client.Del(slug, "blogs/"+slug).Result()
+	return
+}
