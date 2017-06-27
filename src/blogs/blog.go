@@ -1,7 +1,7 @@
 package blogs
 
 import (
-	"blog-api/redis"
+	"blog-api/src/redis"
 	"encoding/json"
 	"io"
 	"time"

@@ -1,7 +1,7 @@
 package router
 
 import (
-	"blog-api/blogs"
+	"blog-api/src/blogs"
 )
 
 var routes = Routes{

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"blog-api/router"
+	"blog-api/src/router"
 	"net/http"
 )
 
